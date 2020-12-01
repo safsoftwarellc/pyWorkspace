@@ -1,0 +1,23 @@
+1) Create Python Environment (In Project folder TDMS)
+    python -m venv env
+    source env/bin/activate
+    deactivate
+2) To Install latest PIP
+    pip install --upgrade pip'
+3) Load Packages - Pandas, PyMongo (Following added after this)
+    Also Add xlrd Package to work with Excels
+        Package         Version
+        --------------- -------
+        numpy           1.19.4
+        pandas          1.1.4
+        pip             20.2.3
+        pymongo         3.11.1
+        python-dateutil 2.8.1
+        pytz            2020.4
+        setuptools      49.2.1
+        six             1.15.0
+        xlrd            1.2.0
+4) create app file in TDMS folder 
+    app.py created
+5) Write a Program to read excel Data to Data Frame
+    PyMongoTDM.py created and DF to JSON and DF to Dictionary created

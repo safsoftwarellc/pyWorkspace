@@ -1,0 +1,23 @@
+Test Data Managemnet System (TDMS)
+
+Description: Load Data from Excel Sheet and Store in MongoDB
+
+Step1:  Create Python Environment (25th Nov)
+        Python 3.9 version
+        Load Packages - Pandas, PyMongo
+
+Step2:  Write a Program to read excel Data to Data Frame (26th Nov)
+        Single File Program (PyMongoTDM.py)
+        Convert Data Frame to JSON Object
+        Convert JSON to Dictionary
+
+Step3:  Write a Program to Store JSON into MongoDB (30th Nov)
+        Create Collection
+        Store Data into Collection
+        Find Data from Collection
+        Convert JSON Collection to Data Frame and Dictionary
+
+Step4: Work on Flask REST API for TDMS (TBD)
+Step5: Deploy to Heroku server
+Step6: Dockerise the Flask App (To be Done by End of December)
+
