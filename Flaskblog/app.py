@@ -1,7 +1,7 @@
 # First Flask Project
 # Flask Blogger
 
-from flask import Flask, render_template
+from flask import Flask, render_template, flash, redirect, url_for
 from forms import RegistrationForm, LoginForm
 
 posts = [
@@ -22,6 +22,7 @@ posts = [
 ]
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '4c1c3629a638519ab777ac25f9ab306f'
 
 
 @app.route("/")
@@ -38,12 +39,23 @@ def about():
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
+    if form.validate_on_submit():
+        flash(f'User Created {{form.username.data}}', 'success')
+        return redirect(url_for('home'))
+    # else:
+    #    flash(f'User Created {{form.username.data}}', 'success')
     return render_template('register.html', title='Register', form=form)
 
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+    if form.validate_on_submit():
+        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
+            flash('You have been logged in!', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('login.html', title='Login', form=form)
 
 
