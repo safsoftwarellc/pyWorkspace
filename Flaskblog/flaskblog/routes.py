@@ -1,8 +1,8 @@
-# First Flask Project
-# Flask Blogger
 
-from flask import Flask, render_template, flash, redirect, url_for
-from forms import RegistrationForm, LoginForm
+from flask import render_template, flash, redirect, url_for
+from flaskblog import app
+from flaskblog.forms import RegistrationForm, LoginForm
+from flaskblog.models import User, Post
 
 posts = [
     {
@@ -17,26 +17,21 @@ posts = [
         "content": "This is the OLD post for this Blog",
         "date": "Apr 08 2018"
     }
-
-
 ]
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = '4c1c3629a638519ab777ac25f9ab306f'
 
-
-@app.route("/")
-@app.route("/home")
+@ app.route("/")
+@ app.route("/home")
 def home():
     return render_template('home.html', posts=posts)
 
 
-@app.route("/about")
+@ app.route("/about")
 def about():
     return render_template('about.html', title='About')
 
 
-@app.route("/register", methods=['GET', 'POST'])
+@ app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -47,7 +42,7 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-@app.route("/login", methods=['GET', 'POST'])
+@ app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -57,7 +52,3 @@ def login():
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('login.html', title='Login', form=form)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
