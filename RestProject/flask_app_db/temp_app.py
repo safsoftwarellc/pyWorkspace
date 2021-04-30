@@ -1,7 +1,6 @@
-dic_1 = {
-    "name": "Sunil",
-    "Class": "10th"
-}
+s = "/FpML/header/message-Id - messageId"
 
-for k in dic_1:
-    print("{} {}".format(k, dic_1[k]))
+print((s.split('-')[1]).strip())
+print(s.rfind('-'))
+print(s[25:].strip())
+print(s[:24].strip())

@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify, make_response, current_app, send_from_directory, send_file
 from main.util.xml_util import get_namespace, remove_namespace, get_xpath_for_element
 from main.util.utility import allowed_file
-from main.service.xml_db_service import save_xml_data, get_xml_data, remove_xml_data, get_all_xml_data, save_xpaths_data, get_all_xpaths_for_file
+from main.service.xml_db_service import (save_xml_data, get_xml_data, 
+                                        remove_xml_data, get_all_xml_data, save_xpaths_data, 
+                                        get_all_xpaths_for_file, delete_all_xpaths_for_file)
 from werkzeug.utils import secure_filename
 import lxml.etree as ET
 import json
@@ -43,10 +45,11 @@ def generateXpathsForXMLFile():
     file_info =  get_xml_data(file_name)
     root = ET.parse(BytesIO(file_info.file_data)).getroot()
     xpath_name=''
-    all_nodes = {}
+    all_nodes = []
     all_nodes = get_xpath_for_element(root, xpath_name, all_nodes)
     ns = get_namespace(root.tag)
-    return jsonify({'ns': ns, 'allXpaths':all_nodes})
+    all_nodes.append(ns + ' - ns')
+    return jsonify({'allXpaths':all_nodes})
 
 @xml_app.route('/getAllTemplateXMLFiles', methods=['GET'])
 def getAllTemplateXMLFiles():
@@ -76,7 +79,9 @@ def getXpathsForTemplateFile():
 
 @xml_app.route('/deleteXpathsForTemplateFile', methods=['DELETE'])
 def deleteXpathsForTemplateFile():
-    pass
+    file_name=request.args.get('xmlfile_name')
+    totalDeleted = delete_all_xpaths_for_file(file_name)
+    return jsonify({'status':'XPaths ['+str(totalDeleted)+'] Deleted for file '+file_name})
 
 @xml_app.route('/getUpdatedTemplateXMLFile', methods=['GET'])
 def getUpdatedTemplateXMLFile():
