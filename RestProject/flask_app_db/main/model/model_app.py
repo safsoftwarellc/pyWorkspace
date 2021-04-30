@@ -14,13 +14,14 @@ class xml_data(db.Model):
 class xpath_data(db.Model):
     __tablename__='xpath_data'
     xpath_id = db.Column(db.Integer, primary_key=True)
-    
+
     file_id = db.Column(db.Integer, db.ForeignKey('xml_data.file_id'), nullable=False)
     file_id_relation = db.relationship('xml_data', backref=db.backref('xpaths', lazy=True))
 
+    xpath_name = db.Column(db.String(80), nullable = False)
     xpath_string = db.Column(db.String(250), nullable = False)
     update_date = db.Column(db.DateTime())
-    
+
     def __repr__(self):
         return 'Xpath - {}'.format(self.xpath_string)
 

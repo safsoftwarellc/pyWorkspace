@@ -3,7 +3,12 @@ from flask_script import Manager
 
 from main import create_app, db
 from main.model.model_app import xml_data, xpath_data, excel_data, queue_config
-from main.controller.xml_controller import getXMLXpaths, getUpdatedXMLFile
+from main.controller.xml_controller import (
+    saveTemplateXMLFile, getTemplateXMLFile,
+    removeTemplateXMLFile, generateXpathsForXMLFile,
+    getAllTemplateXMLFiles, getUpdatedTemplateXMLFile,
+    saveXpathsForTemplateFile, getXpathsForTemplateFile,
+    deleteXpathsForTemplateFile, getUpdatedTemplateXMLFile)
 
 
 app = create_app('dev')
@@ -21,4 +26,3 @@ def run():
 
 if __name__ == '__main__':
     manager.run()
-
