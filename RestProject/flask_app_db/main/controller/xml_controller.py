@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, make_response, current_app, send_from_directory, send_file
-from main.util.xml_util import get_namespace, remove_namespace, get_xpath_for_element, get_updated_xml
+from main.util.xml_util import (get_namespace, remove_namespace, get_xpath_for_element, 
+                                get_updated_xml, get_xpaths_for_xml_tree)
 from main.util.utility import allowed_file
 from main.service.xml_db_service import (save_xml_data, get_xml_data, 
                                         remove_xml_data, get_all_xml_data, save_xpaths_data, 
@@ -42,13 +43,22 @@ def removeTemplateXMLFile():
 @xml_app.route('/generateXpathsForXMLFile', methods=['GET'])
 def generateXpathsForXMLFile():
     file_name=request.args.get('xmlfile_name')
+    ns_string=request.args.get('ns_json')
+    ns_json = None
+    if ns_string is not None:
+        ns_json = json.loads(ns_string)
     file_info =  get_xml_data(file_name)
     root = ET.parse(BytesIO(file_info.file_data)).getroot()
-    xpath_name=''
-    all_nodes = []
-    all_nodes = get_xpath_for_element(root, xpath_name, all_nodes)
-    ns = get_namespace(root.tag)
-    all_nodes.append(ns + ' - ns')
+    tree = ET.ElementTree(root)
+    all_nodes = get_xpaths_for_xml_tree(root, tree, ns_json)
+    all_nodes.append(ns_string + ' - ns')
+    
+    #xpath_name=''
+    #all_nodes = []
+    #all_nodes = get_xpath_for_element(root, xpath_name, all_nodes)
+    #ns = get_namespace(root.tag)
+    #all_nodes.append(ns + ' - ns')
+    
     return jsonify({'allXpaths':all_nodes})
 
 @xml_app.route('/getAllTemplateXMLFiles', methods=['GET'])
@@ -96,34 +106,3 @@ def getUpdatedTemplateXMLFile():
     str = ET.tostring(root, pretty_print=True)
     return str
 
-    
-"""ns = None
-for xpath_key in all_xpaths:
-    if all_xpaths[xpath_key] == 'ns':
-        ns = {'xmlns': xpath_key}
-        break
-
-for xpath_key in all_xpaths:
-    ns_xpath_key = xpath_key
-    if ns is not None:
-        xpath_key_list = xpath_key.split('/')
-        last_index_of_list = len(xpath_key_list)-1
-        extra_slash = False
-        if xpath_key_list[last_index_of_list] == '':
-            extra_slash = True
-            del(xpath_key_list[last_index_of_list])
-
-        ns_xpath_key = '/xmlns:'.join(xpath_key_list)
-        if extra_slash:
-            ns_xpath_key = ns_xpath_key + '/'
-
-    if all_xpaths[xpath_key] in json_data:
-        xpath_value = json_data[all_xpaths[xpath_key]]
-        print(ns_xpath_key)
-        print(ns)
-        for ele in root.xpath(ns_xpath_key, namespaces=ns):
-            print(all_xpaths[xpath_key])
-            ele.text = xpath_value
-str = ET.tostring(root, pretty_print=True)
-return str
-"""        
