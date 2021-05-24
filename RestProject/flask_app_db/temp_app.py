@@ -1,10 +1,16 @@
-s = "/FpML/header/message/"
+import lxml.etree as ET
 
-s_list = s.split('/')
-k = len(s_list)
-if s_list[k-1] == '':
-    print("Emplty")
-    del(s_list[k-1])
-#for s_name in s_list:
-print(s_list)
-print('/xmlns:'.join(s_list))
+root = ET.parse('Upload_Files/msg-ex21-credit-event-notice.xml').getroot()
+tree = ET.ElementTree(root)
+ns={'xmlns':'http://www.fpml.org/2009/FpML-4-6'}
+
+for ele in root.iter():
+    if len(ele)==0:
+        #print(tree.getpath(ele))
+        xpath = tree.getelementpath(ele)
+        for key in ns:
+            xpath = xpath.replace('{'+ns[key]+'}', key+':')
+        print(xpath)
+
+
+
