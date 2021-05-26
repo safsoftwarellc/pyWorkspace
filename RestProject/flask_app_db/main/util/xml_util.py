@@ -1,4 +1,6 @@
 
+import json
+
 def get_namespace(full_xml_text):
     if full_xml_text.startswith('{'):
         return full_xml_text[1:full_xml_text.find('}')]
@@ -31,29 +33,31 @@ def get_xpath_for_element(ele, xpath_string, all_nodes):
     return all_nodes
 
 def get_updated_xml(root, all_xpaths, json_data):
-    ns = get_namespace_info_from_xpaths(all_xpaths)
-    return replace_xml_values_by_xpath(root, all_xpaths, json_data, ns)
+    ns_string = get_namespace_info_from_xpaths(all_xpaths)
+    ns_json = None
+    if ns_string is not None:
+        print(ns_string)
+        ns_json = json.loads(ns_string)
+    return replace_xml_values_by_xpath(root, all_xpaths, json_data, ns_json)
 
 
 def replace_xml_values_by_xpath(root, all_xpaths, json_data, ns):
     
     for xpath_key in all_xpaths:
-        ns_xpath_key = get_namespace_updated_xpath(xpath_key, ns)
-
         if all_xpaths[xpath_key] in json_data:
             xpath_value = json_data[all_xpaths[xpath_key]]
             if ns is None:
-                for ele in root.xpath(ns_xpath_key):
+                for ele in root.xpath(xpath_key):
                     ele.text = xpath_value
             else:
-                for ele in root.xpath(ns_xpath_key, namespaces=ns):
+                for ele in root.xpath(xpath_key, namespaces=ns):
                     ele.text = xpath_value
     return root
                     
 def get_namespace_info_from_xpaths(all_xpaths):
     for xpath_key in all_xpaths:
         if all_xpaths[xpath_key] == 'ns':
-            return {'xmlns': xpath_key}
+            return xpath_key
     return None
 
 def get_namespace_updated_xpath(xpath_string, ns):

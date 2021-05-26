@@ -51,7 +51,8 @@ def generateXpathsForXMLFile():
     root = ET.parse(BytesIO(file_info.file_data)).getroot()
     tree = ET.ElementTree(root)
     all_nodes = get_xpaths_for_xml_tree(root, tree, ns_json)
-    all_nodes.append(ns_string + ' - ns')
+    if ns_string is not None:
+        all_nodes.append(ns_string + ' - ns')
     
     #xpath_name=''
     #all_nodes = []
