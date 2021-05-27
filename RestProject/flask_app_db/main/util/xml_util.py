@@ -82,3 +82,21 @@ def split_xpath_full_string(xpath_full_string):
     xpath_name = xpath_full_string[lastIndex+1:].strip()
     xpath_string = xpath_full_string[:lastIndex].strip()
     return (xpath_name, xpath_string)
+
+def get_xpath_names_with_sample_data(root, all_xpaths_json):
+    all_names = {}
+    ns = get_namespace_info_from_xpaths(all_xpaths_json)
+    if 'allXpaths' not in all_xpaths_json:
+        return all_names
+    all_xpaths = all_xpaths_json['allXpaths']
+    for xpath_full_string in all_xpaths:
+        (xpath_name, xpath_string) = split_xpath_full_string(xpath_full_string)
+        xpath_value = ''
+        if ns is None:
+            for ele in root.xpath(xpath_string):
+                xpath_value = ele.text
+        else:
+            for ele in root.xpath(xpath_string, namespaces=ns):
+                xpath_value = ele.text
+        all_names[xpath_name] = xpath_value
+    return all_names

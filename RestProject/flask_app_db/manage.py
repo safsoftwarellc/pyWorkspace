@@ -8,7 +8,8 @@ from main.controller.xml_controller import (
     removeTemplateXMLFile, generateXpathsForXMLFile,
     getAllTemplateXMLFiles, getUpdatedTemplateXMLFile,
     saveXpathsForTemplateFile, getXpathsForTemplateFile,
-    deleteXpathsForTemplateFile, getUpdatedTemplateXMLFile)
+    deleteXpathsForTemplateFile, getUpdatedTemplateXMLFile,
+    getXpathNamesWithSampleDataForTemplateFile)
 
 
 app = create_app('dev')
