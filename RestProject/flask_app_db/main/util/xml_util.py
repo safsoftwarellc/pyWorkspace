@@ -32,32 +32,32 @@ def get_xpath_for_element(ele, xpath_string, all_nodes):
         
     return all_nodes
 
-def get_updated_xml(root, all_xpaths, json_data):
-    ns_string = get_namespace_info_from_xpaths(all_xpaths)
-    ns_json = None
-    if ns_string is not None:
-        print(ns_string)
-        ns_json = json.loads(ns_string)
-    return replace_xml_values_by_xpath(root, all_xpaths, json_data, ns_json)
+def get_updated_xml(root, all_xpaths_json, json_data):
+    ns_json = get_namespace_info_from_xpaths(all_xpaths_json)
+    return replace_xml_values_by_xpath(root, all_xpaths_json, json_data, ns_json)
 
 
-def replace_xml_values_by_xpath(root, all_xpaths, json_data, ns):
-    
-    for xpath_key in all_xpaths:
-        if all_xpaths[xpath_key] in json_data:
-            xpath_value = json_data[all_xpaths[xpath_key]]
+def replace_xml_values_by_xpath(root, all_xpaths_json, json_data, ns):
+    if 'allXpaths' not in all_xpaths_json:
+        return None
+    all_xpaths = all_xpaths_json['allXpaths']
+
+    for xpath_full_string in all_xpaths:
+        (xpath_name, xpath_string) = split_xpath_full_string(xpath_full_string)
+        if xpath_name in json_data:
+            xpath_value = json_data[xpath_name]
             if ns is None:
-                for ele in root.xpath(xpath_key):
+                for ele in root.xpath(xpath_string):
                     ele.text = xpath_value
             else:
-                for ele in root.xpath(xpath_key, namespaces=ns):
+                for ele in root.xpath(xpath_string, namespaces=ns):
                     ele.text = xpath_value
+            
     return root
                     
-def get_namespace_info_from_xpaths(all_xpaths):
-    for xpath_key in all_xpaths:
-        if all_xpaths[xpath_key] == 'ns':
-            return xpath_key
+def get_namespace_info_from_xpaths(all_xpaths_json):
+    if (all_xpaths_json is not None) and ('ns' in all_xpaths_json):
+        return all_xpaths_json['ns']
     return None
 
 def get_namespace_updated_xpath(xpath_string, ns):
@@ -76,3 +76,9 @@ def get_namespace_updated_xpath(xpath_string, ns):
         xpath_string = xpath_string + '/'
     
     return xpath_string
+
+def split_xpath_full_string(xpath_full_string):
+    lastIndex = xpath_full_string.rfind('-')
+    xpath_name = xpath_full_string[lastIndex+1:].strip()
+    xpath_string = xpath_full_string[:lastIndex].strip()
+    return (xpath_name, xpath_string)

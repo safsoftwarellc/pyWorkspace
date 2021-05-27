@@ -1,6 +1,8 @@
 from main.model.model_app import xml_data, xpath_data
+from main.util.xml_util import split_xpath_full_string
 import datetime
 from main import db
+import json
 
 def save_xml_data(file_name, file):
     data = xml_data(file_name=file_name, file_data=file.read(), update_date=datetime.datetime.utcnow())
@@ -22,33 +24,48 @@ def save_xpaths_data(file_name, xpath_dict):
         return False
     xpath_records = get_all_xpaths_db_records(file_name)
     if (xpath_records is not None):
-        # xpath_records.count()>0
         delete_xpaths_from_db(xpath_records)
-    return add_xpaths_into_db(file_info, xpath_dict['allXpaths'])
+    return add_xpaths_into_db(file_info, xpath_dict)
 
 
 def get_all_xpaths_for_file(file_name):
     xpath_records = get_all_xpaths_db_records(file_name)
-    all_xpaths = {}
+    all_xpaths = []
+    ns_string = None
     if (xpath_records is None) or xpath_records.count()==0:
-        return all_xpaths
+        return ({'allXpaths':all_xpaths})
     for xpath_record in xpath_records:
-        all_xpaths[xpath_record.xpath_string] = xpath_record.xpath_name
-    return all_xpaths
+        if xpath_record.xpath_name == 'ns':
+            ns_string = xpath_record.xpath_string
+        else:
+            all_xpaths.append(xpath_record.xpath_string + ' - ' + xpath_record.xpath_name)
+    if ns_string is not None:
+        return ({'allXpaths':all_xpaths, 'ns':json.loads(ns_string)})
+    return ({'allXpaths':all_xpaths})
 
 def delete_all_xpaths_for_file(file_name):
     xpath_records = get_all_xpaths_db_records(file_name)
     return delete_xpaths_from_db(xpath_records)
 
 
-def add_xpaths_into_db(file_info, allXpaths):
+def add_xpaths_into_db(file_info, xpath_dict):
+    if 'allXpaths' not in xpath_dict:
+        return False
+    allXpaths = xpath_dict['allXpaths']
     if len(allXpaths)>0:
         for xpath_full_string in allXpaths:
-            lastIndex = xpath_full_string.rfind('-')
-            xpath_name = xpath_full_string[lastIndex+1:].strip()
-            xpath_string = xpath_full_string[:lastIndex].strip()
+            (xpath_name, xpath_string) = split_xpath_full_string(xpath_full_string)
+            #lastIndex = xpath_full_string.rfind('-')
+            #xpath_name = xpath_full_string[lastIndex+1:].strip()
+            #xpath_string = xpath_full_string[:lastIndex].strip()
             xpath_record = xpath_data(file_id=file_info.file_id, xpath_name=xpath_name, xpath_string=xpath_string, update_date=datetime.datetime.utcnow())
             db.session.add(xpath_record)
+        if 'ns' in xpath_dict:
+            ns_json = xpath_dict['ns']
+            if ns_json is not None:
+                ns_string = json.dumps(ns_json)
+                xpath_record = xpath_data(file_id=file_info.file_id, xpath_name='ns', xpath_string=ns_string, update_date=datetime.datetime.utcnow())
+                db.session.add(xpath_record)
         db.session.commit()
     return True
 

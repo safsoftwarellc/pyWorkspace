@@ -52,14 +52,8 @@ def generateXpathsForXMLFile():
     tree = ET.ElementTree(root)
     all_nodes = get_xpaths_for_xml_tree(root, tree, ns_json)
     if ns_string is not None:
-        all_nodes.append(ns_string + ' - ns')
-    
-    #xpath_name=''
-    #all_nodes = []
-    #all_nodes = get_xpath_for_element(root, xpath_name, all_nodes)
-    #ns = get_namespace(root.tag)
-    #all_nodes.append(ns + ' - ns')
-    
+        ns_json = json.loads(ns_string)
+        return jsonify({'allXpaths':all_nodes, 'ns':ns_json})
     return jsonify({'allXpaths':all_nodes})
 
 @xml_app.route('/getAllTemplateXMLFiles', methods=['GET'])
@@ -86,7 +80,7 @@ def saveXpathsForTemplateFile():
 @xml_app.route('/getXpathsForTemplateFile', methods=['GET'])
 def getXpathsForTemplateFile():
     file_name=request.args.get('xmlfile_name')
-    return get_all_xpaths_for_file(file_name)
+    return jsonify(get_all_xpaths_for_file(file_name))
 
 @xml_app.route('/deleteXpathsForTemplateFile', methods=['DELETE'])
 def deleteXpathsForTemplateFile():
@@ -99,10 +93,12 @@ def getUpdatedTemplateXMLFile():
     file_name=request.args.get('xmlfile_name')
     json_data = request.get_json()
     file_info = get_xml_data(file_name)
-    all_xpaths = get_all_xpaths_for_file(file_name)
+    all_xpaths_json = get_all_xpaths_for_file(file_name)
     root = ET.parse(BytesIO(file_info.file_data)).getroot()
     
-    root = get_updated_xml(root, all_xpaths, json_data)
+    root = get_updated_xml(root, all_xpaths_json, json_data)
+    if root is None:
+        return jsonify({'Status':'Unknown error!'})
     
     str = ET.tostring(root, pretty_print=True)
     return str
